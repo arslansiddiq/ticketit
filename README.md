@@ -95,3 +95,6 @@ https://github.com/thekordy/ticketit/graphs/contributors
 
 [![statistics](https://packagist-statistics.dura.hu/kordy/ticketit/10days.svg)](https://packagist-statistics.dura.hu/kordy/ticketit/10days.svg)
 
+## ToDo in Fork
+
+Laraverl Default Auth System to Sentinal Auth System for TicketIt HelpDesk for Laravel
