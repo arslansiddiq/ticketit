@@ -52,7 +52,7 @@ class TicketitTableSeeder extends Seeder
         $faker = \Faker\Factory::create();
 
         // create agents
-        $agents_counter = 1;
+        $agents_counter = 0;
 
         for ($a = 1; $a <= $this->agents_qty; $a++) {
             $agent_info = new \App\User();
@@ -80,9 +80,9 @@ class TicketitTableSeeder extends Seeder
                 'name'  => $name,
                 'color' => $color,
             ]);
-            $agent = array_rand($agents, $this->agents_per_category);
-            $category->agents()->attach($agent);
-            $counter++;
+            // $agent = array_rand($agents, $this->agents_per_category);
+            // $category->agents()->attach($agent);
+            // $counter++;
         }
 
         // create tickets statuses
@@ -97,7 +97,7 @@ class TicketitTableSeeder extends Seeder
         $statuses_qty = \Kordy\Ticketit\Models\Status::count();
 
         // create users
-        $users_counter = 1;
+        $users_counter = 0;
 
         for ($u = 1; $u <= $this->users_qty; $u++) {
             $user_info = new \App\User();

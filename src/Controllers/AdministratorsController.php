@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Kordy\Ticketit\Models\Agent;
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 
 class AdministratorsController extends Controller
 {
@@ -19,7 +19,7 @@ class AdministratorsController extends Controller
 
     public function create()
     {
-        $users = Agent::paginate(Setting::grab('paginate_items'));
+        $users = Agent::paginate(TSetting::grab('paginate_items'));
 
         return view('ticketit::admin.administrator.create', compact('users'));
     }

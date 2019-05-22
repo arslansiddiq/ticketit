@@ -4,7 +4,7 @@ namespace Kordy\Ticketit\Seeds;
 
 use Illuminate\Database\Seeder;
 use Kordy\Ticketit\Helpers\LaravelVersion;
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 
 class SettingsTableSeeder extends Seeder
 {
@@ -20,14 +20,14 @@ class SettingsTableSeeder extends Seeder
         $defaults = $this->cleanupAndMerge($this->getDefaults(), $this->config);
 
         foreach ($defaults as $slug => $column) {
-            $setting = Setting::bySlug($slug);
+            $setting = TSetting::bySlug($slug);
 
             if ($setting->count()) {
                 $setting->first()->update([
                     'default' => $column,
                 ]);
             } else {
-                Setting::create([
+                TSetting::create([
                     'lang'    => null,
                     'slug'    => $slug,
                     'value'   => $column,

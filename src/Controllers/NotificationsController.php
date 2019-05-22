@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use Kordy\Ticketit\Helpers\LaravelVersion;
 use Kordy\Ticketit\Models\Comment;
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Models\Ticket;
+use Sentinel;
 
 class NotificationsController extends Controller
 {
@@ -24,7 +25,7 @@ class NotificationsController extends Controller
 
     public function ticketStatusUpdated(Ticket $ticket, Ticket $original_ticket)
     {
-        $notification_owner = auth()->user();
+        $notification_owner = Sentinel::getUser();
         $template = 'ticketit::emails.status';
         $data = [
             'ticket'             => serialize($ticket),
@@ -43,7 +44,7 @@ class NotificationsController extends Controller
 
     public function ticketAgentUpdated(Ticket $ticket, Ticket $original_ticket)
     {
-        $notification_owner = auth()->user();
+        $notification_owner = Sentinel::getUser();
         $template = 'ticketit::emails.transfer';
         $data = [
             'ticket'             => serialize($ticket),
@@ -57,13 +58,12 @@ class NotificationsController extends Controller
 
     public function newTicketNotifyAgent(Ticket $ticket)
     {
-        $notification_owner = auth()->user();
+        $notification_owner = Sentinel::getUser();
         $template = 'ticketit::emails.assigned';
         $data = [
             'ticket'             => serialize($ticket),
             'notification_owner' => serialize($notification_owner),
         ];
-
         $this->sendNotification($template, $data, $ticket, $notification_owner,
             $notification_owner->name.trans('ticketit::lang.notify-created-ticket').$ticket->subject, 'agent');
     }
@@ -106,7 +106,7 @@ class NotificationsController extends Controller
                 $m->subject($subject);
             };
 
-            if (Setting::grab('queue_emails') == 'yes') {
+            if (TSetting::grab('queue_emails') == 'yes') {
                 Mail::queue($template, $data, $mail_callback);
             } else {
                 Mail::send($template, $data, $mail_callback);
@@ -114,7 +114,7 @@ class NotificationsController extends Controller
         } elseif (LaravelVersion::min('5.4')) {
             $mail = new \Kordy\Ticketit\Mail\TicketitNotification($template, $data, $notification_owner, $subject);
 
-            if (Setting::grab('queue_emails') == 'yes') {
+            if (TSetting::grab('queue_emails') == 'yes') {
                 Mail::to($to)->queue($mail);
             } else {
                 Mail::to($to)->send($mail);

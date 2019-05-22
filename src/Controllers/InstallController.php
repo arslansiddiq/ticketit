@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Kordy\Ticketit\Models\Agent;
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Seeds\SettingsTableSeeder;
 use Kordy\Ticketit\Seeds\TicketitTableSeeder;
 
@@ -90,7 +90,7 @@ class InstallController extends Controller
         $admin->ticketit_admin = true;
         $admin->save();
 
-        return redirect('/'.Setting::grab('main_route'));
+        return redirect('/'.TSetting::grab('main_route'));
     }
 
     /*
@@ -102,7 +102,7 @@ class InstallController extends Controller
         if (Agent::isAdmin()) {
             $this->initialSettings();
 
-            return redirect('/'.Setting::grab('main_route'));
+            return redirect('/'.TSetting::grab('main_route'));
         }
         \Log::emergency('Ticketit upgrade path access: Only admin is allowed to upgrade');
 

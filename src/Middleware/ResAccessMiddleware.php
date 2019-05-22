@@ -5,7 +5,7 @@ namespace Kordy\Ticketit\Middleware;
 use Closure;
 use Kordy\Ticketit\Helpers\LaravelVersion;
 use Kordy\Ticketit\Models\Agent;
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 
 class ResAccessMiddleware
 {
@@ -24,23 +24,23 @@ class ResAccessMiddleware
         }
 
         // All Agents have access in none restricted mode
-        if (Setting::grab('agent_restrict') == 'no') {
+        if (TSetting::grab('agent_restrict') == 'no') {
             if (Agent::isAgent()) {
                 return $next($request);
             }
         }
 
         // if this is a ticket show page
-        if ($request->route()->getName() == Setting::grab('main_route').'.show') {
+        if ($request->route()->getName() == TSetting::grab('main_route').'.show') {
             if (LaravelVersion::lt('5.2.0')) {
-                $ticket_id = $request->route(Setting::grab('main_route'));
+                $ticket_id = $request->route(TSetting::grab('main_route'));
             } else {
                 $ticket_id = $request->route('ticket');
             }
         }
 
         // if this is a new comment on a ticket
-        if ($request->route()->getName() == Setting::grab('main_route').'-comment.store') {
+        if ($request->route()->getName() == TSetting::grab('main_route').'-comment.store') {
             $ticket_id = $request->get('ticket_id');
         }
 

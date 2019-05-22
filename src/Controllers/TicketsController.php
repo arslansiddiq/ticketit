@@ -10,8 +10,9 @@ use Kordy\Ticketit\Helpers\LaravelVersion;
 use Kordy\Ticketit\Models;
 use Kordy\Ticketit\Models\Agent;
 use Kordy\Ticketit\Models\Category;
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Models\Ticket;
+use Sentinel;
 
 class TicketsController extends Controller
 {
@@ -36,7 +37,7 @@ class TicketsController extends Controller
             $datatables = app(\Yajra\Datatables\Datatables::class);
         }
 
-        $user = $this->agent->find(auth()->user()->id);
+        $user = $this->agent->find(Sentinel::getUser()->id);
 
         if ($user->isAdmin()) {
             if ($complete) {
@@ -97,7 +98,7 @@ class TicketsController extends Controller
     {
         $collection->editColumn('subject', function ($ticket) {
             return (string) link_to_route(
-                Setting::grab('main_route').'.show',
+                TSetting::grab('main_route').'.show',
                 $ticket->subject,
                 $ticket->id
             );
@@ -221,8 +222,8 @@ class TicketsController extends Controller
         $ticket->priority_id = $request->priority_id;
         $ticket->category_id = $request->category_id;
 
-        $ticket->status_id = Setting::grab('default_status_id');
-        $ticket->user_id = auth()->user()->id;
+        $ticket->status_id = TSetting::grab('default_status_id');
+        $ticket->user_id = Sentinel::getUser()->id;
         $ticket->autoSelectAgent();
 
         $ticket->save();
@@ -255,7 +256,7 @@ class TicketsController extends Controller
             $agent_lists = ['auto' => 'Auto Select'];
         }
 
-        $comments = $ticket->comments()->paginate(Setting::grab('paginate_items'));
+        $comments = $ticket->comments()->paginate(TSetting::grab('paginate_items'));
 
         return view('ticketit::tickets.show',
             compact('ticket', 'status_lists', 'priority_lists', 'category_lists', 'agent_lists', 'comments',
@@ -301,7 +302,7 @@ class TicketsController extends Controller
 
         session()->flash('status', trans('ticketit::lang.the-ticket-has-been-modified'));
 
-        return redirect()->route(Setting::grab('main_route').'.show', $id);
+        return redirect()->route(TSetting::grab('main_route').'.show', $id);
     }
 
     /**
@@ -319,7 +320,7 @@ class TicketsController extends Controller
 
         session()->flash('status', trans('ticketit::lang.the-ticket-has-been-deleted', ['name' => $subject]));
 
-        return redirect()->route(Setting::grab('main_route').'.index');
+        return redirect()->route(TSetting::grab('main_route').'.index');
     }
 
     /**
@@ -335,8 +336,8 @@ class TicketsController extends Controller
             $ticket = $this->tickets->findOrFail($id);
             $ticket->completed_at = Carbon::now();
 
-            if (Setting::grab('default_close_status_id')) {
-                $ticket->status_id = Setting::grab('default_close_status_id');
+            if (TSetting::grab('default_close_status_id')) {
+                $ticket->status_id = TSetting::grab('default_close_status_id');
             }
 
             $subject = $ticket->subject;
@@ -344,10 +345,10 @@ class TicketsController extends Controller
 
             session()->flash('status', trans('ticketit::lang.the-ticket-has-been-completed', ['name' => $subject]));
 
-            return redirect()->route(Setting::grab('main_route').'.index');
+            return redirect()->route(TSetting::grab('main_route').'.index');
         }
 
-        return redirect()->route(Setting::grab('main_route').'.index')
+        return redirect()->route(TSetting::grab('main_route').'.index')
             ->with('warning', trans('ticketit::lang.you-are-not-permitted-to-do-this'));
     }
 
@@ -364,8 +365,8 @@ class TicketsController extends Controller
             $ticket = $this->tickets->findOrFail($id);
             $ticket->completed_at = null;
 
-            if (Setting::grab('default_reopen_status_id')) {
-                $ticket->status_id = Setting::grab('default_reopen_status_id');
+            if (TSetting::grab('default_reopen_status_id')) {
+                $ticket->status_id = TSetting::grab('default_reopen_status_id');
             }
 
             $subject = $ticket->subject;
@@ -373,10 +374,10 @@ class TicketsController extends Controller
 
             session()->flash('status', trans('ticketit::lang.the-ticket-has-been-reopened', ['name' => $subject]));
 
-            return redirect()->route(Setting::grab('main_route').'.index');
+            return redirect()->route(TSetting::grab('main_route').'.index');
         }
 
-        return redirect()->route(Setting::grab('main_route').'.index')
+        return redirect()->route(TSetting::grab('main_route').'.index')
             ->with('warning', trans('ticketit::lang.you-are-not-permitted-to-do-this'));
     }
 
@@ -407,7 +408,7 @@ class TicketsController extends Controller
      */
     public function permToClose($id)
     {
-        $close_ticket_perm = Setting::grab('close_ticket_perm');
+        $close_ticket_perm = TSetting::grab('close_ticket_perm');
 
         if ($this->agent->isAdmin() && $close_ticket_perm['admin'] == 'yes') {
             return 'yes';
@@ -429,7 +430,7 @@ class TicketsController extends Controller
      */
     public function permToReopen($id)
     {
-        $reopen_ticket_perm = Setting::grab('reopen_ticket_perm');
+        $reopen_ticket_perm = TSetting::grab('reopen_ticket_perm');
         if ($this->agent->isAdmin() && $reopen_ticket_perm['admin'] == 'yes') {
             return 'yes';
         } elseif ($this->agent->isAgent() && $reopen_ticket_perm['agent'] == 'yes') {

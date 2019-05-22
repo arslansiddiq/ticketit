@@ -2,7 +2,7 @@
 
 namespace Kordy\Ticketit\Helpers;
 
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 
 class EditorLocale
 {
@@ -11,7 +11,7 @@ class EditorLocale
      */
     public static function getEditorLocale()
     {
-        $editor_locale = Setting::grab('summernote_locale');
+        $editor_locale = TSetting::grab('summernote_locale');
 
         if ($editor_locale == 'laravel') {
             $editor_locale = config('app.locale');

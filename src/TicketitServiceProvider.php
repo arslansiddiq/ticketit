@@ -13,7 +13,7 @@ use Kordy\Ticketit\Controllers\InstallController;
 use Kordy\Ticketit\Controllers\NotificationsController;
 use Kordy\Ticketit\Helpers\LaravelVersion;
 use Kordy\Ticketit\Models\Comment;
-use Kordy\Ticketit\Models\Setting;
+use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Models\Ticket;
 use Kordy\Ticketit\ViewComposers\TicketItComposer;
 
@@ -31,7 +31,6 @@ class TicketitServiceProvider extends ServiceProvider
             return;
         }
         $installer = new InstallController();
-
         // if a migration or new setting is missing scape to the installation
         if (empty($installer->inactiveMigrations()) && !$installer->inactiveSettings()) {
             // Send the Agent User model to the view under $u
@@ -56,7 +55,7 @@ class TicketitServiceProvider extends ServiceProvider
 
             // Send notification when new comment is added
             Comment::creating(function ($comment) {
-                if (Setting::grab('comment_notification')) {
+                if (TSetting::grab('comment_notification')) {
                     $notification = new NotificationsController();
                     $notification->newComment($comment);
                 }
@@ -64,14 +63,14 @@ class TicketitServiceProvider extends ServiceProvider
 
             // Send notification when ticket status is modified
             Ticket::updating(function ($modified_ticket) {
-                if (Setting::grab('status_notification')) {
+                if (TSetting::grab('status_notification')) {
                     $original_ticket = Ticket::find($modified_ticket->id);
                     if ($original_ticket->status_id != $modified_ticket->status_id || $original_ticket->completed_at != $modified_ticket->completed_at) {
                         $notification = new NotificationsController();
                         $notification->ticketStatusUpdated($modified_ticket, $original_ticket);
                     }
                 }
-                if (Setting::grab('assigned_notification')) {
+                if (TSetting::grab('assigned_notification')) {
                     $original_ticket = Ticket::find($modified_ticket->id);
                     if ($original_ticket->agent->id != $modified_ticket->agent->id) {
                         $notification = new NotificationsController();
@@ -84,7 +83,7 @@ class TicketitServiceProvider extends ServiceProvider
 
             // Send notification when ticket status is modified
             Ticket::created(function ($ticket) {
-                if (Setting::grab('assigned_notification')) {
+                if (TSetting::grab('assigned_notification')) {
                     $notification = new NotificationsController();
                     $notification->newTicketNotifyAgent($ticket);
                 }
@@ -95,7 +94,7 @@ class TicketitServiceProvider extends ServiceProvider
             $this->loadTranslationsFrom(__DIR__.'/Translations', 'ticketit');
 
             $viewsDirectory = __DIR__.'/Views/bootstrap3';
-            if (Setting::grab('bootstrap_version') == '4') {
+            if (TSetting::grab('bootstrap_version') == '4') {
                 $viewsDirectory = __DIR__.'/Views/bootstrap4';
             }
 
@@ -109,13 +108,13 @@ class TicketitServiceProvider extends ServiceProvider
             // Check public assets are present, publish them if not
 //            $installer->publicAssets();
 
-            $main_route = Setting::grab('main_route');
-            $main_route_path = Setting::grab('main_route_path');
-            $admin_route = Setting::grab('admin_route');
-            $admin_route_path = Setting::grab('admin_route_path');
+            $main_route = TSetting::grab('main_route');
+            $main_route_path = TSetting::grab('main_route_path');
+            $admin_route = TSetting::grab('admin_route');
+            $admin_route_path = TSetting::grab('admin_route_path');
 
-            if (file_exists(Setting::grab('routes'))) {
-                include Setting::grab('routes');
+            if (file_exists(TSetting::grab('routes'))) {
+                include TSetting::grab('routes');
             } else {
                 include __DIR__.'/routes.php';
             }
@@ -124,6 +123,7 @@ class TicketitServiceProvider extends ServiceProvider
                 || Request::path() == 'tickets'
                 || Request::path() == 'tickets-admin'
                 || (isset($_SERVER['ARTISAN_TICKETIT_INSTALLING']) && $_SERVER['ARTISAN_TICKETIT_INSTALLING'])) {
+            
             $this->loadTranslationsFrom(__DIR__.'/Translations', 'ticketit');
             $this->loadViewsFrom(__DIR__.'/Views/bootstrap3', 'ticketit');
             $this->publishes([__DIR__.'/Migrations' => base_path('database/migrations')], 'db');
