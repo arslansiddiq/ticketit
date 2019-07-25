@@ -9,6 +9,7 @@ use Kordy\Ticketit\Models\Agent;
 use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Helpers\LaravelVersion;
 use Sentinel;
+use App\User;
 
 class AgentsController extends Controller
 {
@@ -38,22 +39,47 @@ class AgentsController extends Controller
 
     public function store(Request $request)
     {
-    	$rules = [
-            'agents' => 'required|array|min:1',
+        $rules = [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'confirm_password' => 'required'
         ];
 
-        if(LaravelVersion::min('5.2')){
-        	$rules['agents.*'] = 'integer|exists:users,id';
-        }
+        $this->validate($request, $rules);
 
-    	$this->validate($request, $rules);
+        $user_info = new User();
+        $user_info->name = $request->get('first_name').' '.$request->get('last_name');
+        $user_info->first_name = $request->get('first_name');
+        $user_info->last_name = $request->get('last_name');
+        $user_info->email = $request->get('email');
+        $user_info->ticketit_agent = 1;
+        $user_info->parent_user_id = Sentinel::getUser()->id;
+        $user_info->password = bcrypt($request->get('password'));
+        $user_info->save();
 
-        $agents_list = $this->addAgents($request->input('agents'));
-        $agents_names = implode(',', $agents_list);
+        $role = Sentinel::findRoleByName('Ticket Agent');
 
-        Session::flash('status', trans('ticketit::lang.agents-are-added-to-agents', ['names' => $agents_names]));
+        $role->users()->attach($user_info);
 
         return redirect()->action('\Kordy\Ticketit\Controllers\AgentsController@index');
+    	// $rules = [
+     //        'agents' => 'required|array|min:1',
+     //    ];
+
+     //    if(LaravelVersion::min('5.2')){
+     //    	$rules['agents.*'] = 'integer|exists:users,id';
+     //    }
+
+    	// $this->validate($request, $rules);
+
+        // $agents_list = $this->addAgents($request->input('agents'));
+        // $agents_names = implode(',', $agents_list);
+
+        // Session::flash('status', trans('ticketit::lang.agents-are-added-to-agents', ['names' => $agents_names]));
+
+        // return redirect()->action('\Kordy\Ticketit\Controllers\AgentsController@index');
     }
 
     public function update($id, Request $request)

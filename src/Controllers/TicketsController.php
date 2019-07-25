@@ -45,7 +45,7 @@ class TicketsController extends Controller
                 $collection = Ticket::complete()->adminUserTickets($user->id);
             } else {
                 $collection = Ticket::active()->adminUserTickets($user->id);
-                
+
             }
         } elseif ($user->isAgent()) {
             if ($complete) {
@@ -255,6 +255,8 @@ class TicketsController extends Controller
             $first_admin = Sentinel::getUser()->admin_user;
         }elseif (Sentinel::inRole('admin')) {
             $first_admin = Sentinel::getUser();
+        }elseif(Sentinel::inRole('ticket-agent')){
+            $first_admin = Sentinel::getUser()->admin_user;
         }
         // dd($first_admin);
         $cat_agents = Models\Category::find($ticket->category_id)->agents()->where('parent_user_id',$first_admin->id)->agentsLists();
