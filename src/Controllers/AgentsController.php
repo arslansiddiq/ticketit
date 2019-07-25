@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 use Kordy\Ticketit\Models\Agent;
 use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Helpers\LaravelVersion;
+use Cartalyst\Sentinel\Laravel\Facades\Activation;
 use Sentinel;
 use App\User;
 
@@ -62,6 +63,11 @@ class AgentsController extends Controller
         $role = Sentinel::findRoleByName('Ticket Agent');
 
         $role->users()->attach($user_info);
+
+        $user = Sentinel::findById($user_info->id);
+
+        $activation = Activation::create($user);
+        Activation::complete($user, $activation->code);
 
         return redirect()->action('\Kordy\Ticketit\Controllers\AgentsController@index');
     	// $rules = [
