@@ -53,7 +53,7 @@ class CommentsController extends Controller
         $comment->setPurifiedContent($request->get('content'));
 
         $comment->ticket_id = $request->get('ticket_id');
-        $comment->user_id = \Sentinel::getusser()->id;
+        $comment->user_id = \Sentinel::getuser()->id;
         $comment->save();
 
         $ticket = Models\Ticket::find($comment->ticket_id);
