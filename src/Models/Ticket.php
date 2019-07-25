@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Date\Date;
 use Kordy\Ticketit\Traits\ContentEllipse;
 use Kordy\Ticketit\Traits\Purifiable;
+use Sentinel;
+use App\User;
 
 class Ticket extends Model
 {
@@ -189,6 +191,27 @@ class Ticket extends Model
     }
 
     /**
+     * Get all agent tickets.
+     *
+     * @param $query
+     * @param $id
+     *
+     * @return mixed
+     */
+    public function scopeAdminUserTickets($query, $id)
+    {
+        // return $query->where(function ($subquery) use ($id) {
+        //     $subquery->where('agent_id', $id)->orWhere('user_id', $id);
+        // });
+        $userIds = User::find($id)->client_users()->pluck('id')->toArray();
+        array_push($userIds, $id);
+        // dd($userIds);
+        return $query->where(function ($subquery) use ($userIds) {
+            $subquery->whereIn('agent_id', $userIds)->orWhereIn('user_id', $userIds);
+        });
+    }
+
+    /**
      * Sets the agent with the lowest tickets assigned in specific category.
      *
      * @return Ticket
@@ -196,14 +219,29 @@ class Ticket extends Model
     public function autoSelectAgent()
     {
         $cat_id = $this->category_id;
-        $agents = Category::find($cat_id)->agents()->with(['agentOpenTickets' => function ($query) {
-            $query->addSelect(['id', 'agent_id']);
-        }])->get();
+        // $agents = Category::find($cat_id)->agents()->with(['agentOpenTickets' => function ($query) {
+        //     $query->addSelect(['id', 'agent_id']);
+        // }])->get();
+
         $count = 0;
         $lowest_tickets = 1000000;
         // If no agent selected, select the admin
-        $first_admin = Agent::admins()->first();
+        if(Sentinel::inRole('client')){
+            $first_admin = Sentinel::getUser()->admin_user;
+        }elseif (Sentinel::inRole('admin')) {
+            $first_admin = Sentinel::getUser();
+        }
+
+        $role = Sentinel::findRoleById(7);
+        // $agents = $role->users()->where('parent_user_id',$first_admin->id)->get();
+        $agents = Category::find($cat_id)->agents()->where('parent_user_id',$first_admin->id)->with(['agentOpenTickets' => function ($query) {
+            $query->addSelect(['id', 'agent_id']);
+        }])->get();
+        // dd($agents);
+        // 
+        // $first_admin = Agent::admins()->first();
         $selected_agent_id = $first_admin->id;
+
         foreach ($agents as $agent) {
             if ($count == 0) {
                 $lowest_tickets = $agent->agentOpenTickets->count();

@@ -8,12 +8,23 @@ use Illuminate\Support\Facades\Session;
 use Kordy\Ticketit\Models\Agent;
 use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Helpers\LaravelVersion;
+use Sentinel;
 
 class AgentsController extends Controller
 {
     public function index()
     {
-        $agents = Agent::agents()->get();
+        // $role = Sentinel::findRoleById(7);
+        if(Sentinel::inRole('client')){
+            $first_admin = Sentinel::getUser()->admin_user;
+        }elseif (Sentinel::inRole('admin')) {
+            $first_admin = Sentinel::getUser();
+        }
+
+        $agents = Agent::agents()->where('parent_user_id',$first_admin->id)->with(['agentOpenTickets' => function ($query) {
+            $query->addSelect(['id', 'agent_id']);
+        }])->get();
+        // $agents = Agent::agents()->get();
 
         return view('ticketit::admin.agent.index', compact('agents'));
     }

@@ -21,6 +21,7 @@ class TicketsController extends Controller
 
     public function __construct(Ticket $tickets, Agent $agent)
     {
+        Cache::flush();
         $this->middleware('Kordy\Ticketit\Middleware\ResAccessMiddleware', ['only' => ['show']]);
         $this->middleware('Kordy\Ticketit\Middleware\IsAgentMiddleware', ['only' => ['edit', 'update']]);
         $this->middleware('Kordy\Ticketit\Middleware\IsAdminMiddleware', ['only' => ['destroy']]);
@@ -41,9 +42,10 @@ class TicketsController extends Controller
 
         if ($user->isAdmin()) {
             if ($complete) {
-                $collection = Ticket::complete();
+                $collection = Ticket::complete()->adminUserTickets($user->id);
             } else {
-                $collection = Ticket::active();
+                $collection = Ticket::active()->adminUserTickets($user->id);
+                
             }
         } elseif ($user->isAgent()) {
             if ($complete) {
@@ -58,7 +60,7 @@ class TicketsController extends Controller
                 $collection = Ticket::userTickets($user->id)->active();
             }
         }
-
+        // dd($collection->get());
         $collection
             ->join('users', 'users.id', '=', 'ticketit.user_id')
             ->join('ticketit_statuses', 'ticketit_statuses.id', '=', 'ticketit.status_id')
@@ -249,7 +251,15 @@ class TicketsController extends Controller
         $close_perm = $this->permToClose($id);
         $reopen_perm = $this->permToReopen($id);
 
-        $cat_agents = Models\Category::find($ticket->category_id)->agents()->agentsLists();
+        if(Sentinel::inRole('client')){
+            $first_admin = Sentinel::getUser()->admin_user;
+        }elseif (Sentinel::inRole('admin')) {
+            $first_admin = Sentinel::getUser();
+        }
+        // dd($first_admin);
+        $cat_agents = Models\Category::find($ticket->category_id)->agents()->where('parent_user_id',$first_admin->id)->agentsLists();
+
+        // $cat_agents = Models\Category::find($ticket->category_id)->agents()->agentsLists();
         if (is_array($cat_agents)) {
             $agent_lists = ['auto' => 'Auto Select'] + $cat_agents;
         } else {
@@ -383,7 +393,13 @@ class TicketsController extends Controller
 
     public function agentSelectList($category_id, $ticket_id)
     {
-        $cat_agents = Models\Category::find($category_id)->agents()->agentsLists();
+        if(Sentinel::inRole('client')){
+            $first_admin = Sentinel::getUser()->admin_user;
+        }elseif (Sentinel::inRole('admin')) {
+            $first_admin = Sentinel::getUser();
+        }
+        // dd($first_admin);
+        $cat_agents = Models\Category::find($category_id)->agents()->where('parent_user_id',$first_admin->id)->agentsLists();
         if (is_array($cat_agents)) {
             $agents = ['auto' => 'Auto Select'] + $cat_agents;
         } else {

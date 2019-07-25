@@ -6,7 +6,7 @@
                     <span class="badge">
                          <?php 
                             if ($u->isAdmin()) {
-                                echo Kordy\Ticketit\Models\Ticket::active()->count();
+                                echo Kordy\Ticketit\Models\Ticket::active()->adminUserTickets($u->id)->count();
                             } elseif ($u->isAgent()) {
                                 echo Kordy\Ticketit\Models\Ticket::active()->agentUserTickets($u->id)->count();
                             } else {
@@ -21,7 +21,7 @@
                     <span class="badge">
                         <?php 
                             if ($u->isAdmin()) {
-                                echo Kordy\Ticketit\Models\Ticket::complete()->count();
+                                echo Kordy\Ticketit\Models\Ticket::complete()->adminUserTickets($u->id)->count();
                             } elseif ($u->isAgent()) {
                                 echo Kordy\Ticketit\Models\Ticket::complete()->agentUserTickets($u->id)->count();
                             } else {
@@ -65,9 +65,9 @@
                         <li role="presentation"  class="{!! $tools->fullUrlIs(action('\Kordy\Ticketit\Controllers\ConfigurationsController@index').'*') ? "active" : "" !!}">
                             <a href="{{ action('\Kordy\Ticketit\Controllers\ConfigurationsController@index') }}">{{ trans('ticketit::admin.nav-configuration') }}</a>
                         </li>
-                        <li role="presentation"  class="{!! $tools->fullUrlIs(action('\Kordy\Ticketit\Controllers\AdministratorsController@index').'*') ? "active" : "" !!}">
+                        {{-- <li role="presentation"  class="{!! $tools->fullUrlIs(action('\Kordy\Ticketit\Controllers\AdministratorsController@index').'*') ? "active" : "" !!}">
                             <a href="{{ action('\Kordy\Ticketit\Controllers\AdministratorsController@index')}}">{{ trans('ticketit::admin.nav-administrator') }}</a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
             @endif

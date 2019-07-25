@@ -6,8 +6,10 @@
                 <span class="badge badge-pill badge-secondary ">
                      <?php 
                         if ($u->isAdmin()) {
-                            echo Kordy\Ticketit\Models\Ticket::active()->count();
+
+                            echo Kordy\Ticketit\Models\Ticket::active()->adminUserTickets()->count();
                         } elseif ($u->isAgent()) {
+
                             echo Kordy\Ticketit\Models\Ticket::active()->agentUserTickets($u->id)->count();
                         } else {
                             echo Kordy\Ticketit\Models\Ticket::userTickets($u->id)->active()->count();
