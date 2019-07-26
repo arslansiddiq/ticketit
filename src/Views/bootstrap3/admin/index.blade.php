@@ -153,12 +153,12 @@
                         @foreach($categories as $category)
                             <a href="#" class="list-group-item">
                         <span style="color: {{ $category->color }}">
-                            {{ $category->name }} <span class="badge">{{ $category->tickets()->count() }}</span>
+                            {{ $category->name }} <span class="badge">{{ $category->tickets()->adminUserTickets(Sentinel::getUser()->id)->count() }}</span>
                         </span>
                         <span class="pull-right text-muted small">
                             <em>
-                                {{ $category->tickets()->whereNull('completed_at')->count() }} /
-                                 {{ $category->tickets()->whereNotNull('completed_at')->count() }}
+                                {{ $category->tickets()->adminUserTickets(Sentinel::getUser()->id)->whereNull('completed_at')->count() }} /
+                                 {{ $category->tickets()->adminUserTickets(Sentinel::getUser()->id)->whereNotNull('completed_at')->count() }}
                             </em>
                         </span>
                             </a>
@@ -211,7 +211,7 @@
                         @foreach($users as $user)
                             <a href="#" class="list-group-item">
                                 <span>
-                                    {{ $user->name }}
+                                    {{ $user->first_name.' '.$user->last_name }}
                                     <span class="badge">
                                         {{ $user->userTickets(false)->count()  +
                                          $user->userTickets(true)->count() }}

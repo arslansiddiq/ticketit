@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use Kordy\Ticketit\Models\Agent;
 use Kordy\Ticketit\Models\Category;
 use Kordy\Ticketit\Models\Ticket;
+use Sentinel;
 
 class DashboardController extends Controller
 {
     public function index($indicator_period = 2)
     {
-        $tickets_count = Ticket::count();
-        $open_tickets_count = Ticket::whereNull('completed_at')->count();
+        $tickets_count = Ticket::adminUserTickets(Sentinel::getUser()->id)->count();
+        $open_tickets_count = Ticket::adminUserTickets(Sentinel::getUser()->id)->whereNull('completed_at')->count();
         $closed_tickets_count = $tickets_count - $open_tickets_count;
 
         // Per Category pagination
@@ -26,7 +27,7 @@ class DashboardController extends Controller
         }
 
         // Total tickets counter per agent for google pie chart
-        $agents_share_obj = Agent::agents()->with(['agentTotalTickets' => function ($query) {
+        $agents_share_obj = Agent::agents()->where('parent_user_id',Sentinel::getUser()->id)->with(['agentTotalTickets' => function ($query) {
             $query->addSelect(['id', 'agent_id']);
         }])->get();
 
@@ -36,10 +37,10 @@ class DashboardController extends Controller
         }
 
         // Per Agent
-        $agents = Agent::agents(10);
+        $agents = Agent::where('parent_user_id',Sentinel::getUser()->id)->agents(10);
 
         // Per User
-        $users = Agent::users(10);
+        $users = Agent::where('parent_user_id',Sentinel::getUser()->id)->users(10);
 
         // Per Category performance data
         $ticketController = new TicketsController(new Ticket(), new Agent());
