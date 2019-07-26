@@ -232,7 +232,7 @@ class Ticket extends Model
             $first_admin = Sentinel::getUser();
         }
 
-        $role = Sentinel::findRoleById(7);
+        $role = Sentinel::findRoleBySlug('ticket-agent');
         // $agents = $role->users()->where('parent_user_id',$first_admin->id)->get();
         $agents = Category::find($cat_id)->agents()->where('parent_user_id',$first_admin->id)->with(['agentOpenTickets' => function ($query) {
             $query->addSelect(['id', 'agent_id']);

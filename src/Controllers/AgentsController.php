@@ -16,7 +16,7 @@ class AgentsController extends Controller
 {
     public function index()
     {
-        // $role = Sentinel::findRoleById(7);
+        // Sentinel::findRoleBySlug('ticket-agent');
         if(Sentinel::inRole('client')){
             $first_admin = Sentinel::getUser()->admin_user;
         }elseif (Sentinel::inRole('admin')) {
