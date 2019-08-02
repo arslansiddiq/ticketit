@@ -10,6 +10,8 @@ Route::group(['middleware' => \Kordy\Ticketit\Helpers\LaravelVersion::authMiddle
             ->name("$main_route.data");
 
     $field_name = last(explode('/', $main_route_path));
+    Route::get($main_route_path."/crm-ticket", 'Kordy\Ticketit\Controllers\TicketsController@create')->name("$main_route.crmticket.create");
+
     Route::resource($main_route_path, 'Kordy\Ticketit\Controllers\TicketsController', [
             'names' => [
                 'index'   => $main_route.'.index',
@@ -24,6 +26,7 @@ Route::group(['middleware' => \Kordy\Ticketit\Helpers\LaravelVersion::authMiddle
                 $field_name => 'ticket',
             ],
         ]);
+    
 
     //Ticket Comments public route
     $field_name = last(explode('/', "$main_route_path-comment"));

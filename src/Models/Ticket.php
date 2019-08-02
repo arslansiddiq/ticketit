@@ -216,7 +216,7 @@ class Ticket extends Model
      *
      * @return Ticket
      */
-    public function autoSelectAgent()
+    public function autoSelectAgent($for = null)
     {
         $cat_id = $this->category_id;
         // $agents = Category::find($cat_id)->agents()->with(['agentOpenTickets' => function ($query) {
@@ -226,10 +226,14 @@ class Ticket extends Model
         $count = 0;
         $lowest_tickets = 1000000;
         // If no agent selected, select the admin
-        if(Sentinel::inRole('client')){
-            $first_admin = Sentinel::getUser()->admin_user;
-        }elseif (Sentinel::inRole('admin')) {
-            $first_admin = Sentinel::getUser();
+        if($for == 'superadmin'){
+            $first_admin = Sentinel::findRoleBySlug('super-admin')->users()->first();
+        }else{
+            if(Sentinel::inRoleSentinel('client')){
+                $first_admin = Sentinel::getUser()->admin_user;
+            }elseif (Sentinel::inRole('admin')) {
+                $first_admin = Sentinel::getUser();
+            }
         }
 
         $role = Sentinel::findRoleBySlug('ticket-agent');
@@ -237,7 +241,6 @@ class Ticket extends Model
         $agents = Category::find($cat_id)->agents()->where('parent_user_id',$first_admin->id)->with(['agentOpenTickets' => function ($query) {
             $query->addSelect(['id', 'agent_id']);
         }])->get();
-        // dd($agents);
         // 
         // $first_admin = Agent::admins()->first();
         $selected_agent_id = $first_admin->id;

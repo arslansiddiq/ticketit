@@ -226,7 +226,11 @@ class TicketsController extends Controller
 
         $ticket->status_id = TSetting::grab('default_status_id');
         $ticket->user_id = Sentinel::getUser()->id;
-        $ticket->autoSelectAgent();
+        if($request->has('ticket_for')){
+            $ticket->autoSelectAgent('superadmin');
+        }else{
+            $ticket->autoSelectAgent();
+        }
 
         $ticket->save();
 

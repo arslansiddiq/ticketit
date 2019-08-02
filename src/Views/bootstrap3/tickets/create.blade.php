@@ -38,6 +38,9 @@
                     </div>
                 </div>
                 {!! CollectiveForm::hidden('agent_id', 'auto') !!}
+                @if (Request::is($setting->grab('main_route_path')."/crm-ticket"))
+                    {!! CollectiveForm::hidden('ticket_for', 'superadmin') !!}
+                @endif
             </div>
             <br>
             <div class="form-group">
