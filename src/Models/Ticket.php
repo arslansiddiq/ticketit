@@ -229,9 +229,9 @@ class Ticket extends Model
         if($for == 'superadmin'){
             $first_admin = Sentinel::findRoleBySlug('super-admin')->users()->first();
         }else{
-            if(Sentinel::inRoleSentinel('client')){
+            if(Sentinel::inRole('client')){
                 $first_admin = Sentinel::getUser()->admin_user;
-            }elseif (Sentinel::inRole('admin')) {
+            }elseif (Sentinel::inRole('admin') ||  Sentinel::inRole('super-admin')) {
                 $first_admin = Sentinel::getUser();
             }
         }

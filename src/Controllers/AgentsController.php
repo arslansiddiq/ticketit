@@ -19,7 +19,7 @@ class AgentsController extends Controller
         // Sentinel::findRoleBySlug('ticket-agent');
         if(Sentinel::inRole('client')){
             $first_admin = Sentinel::getUser()->admin_user;
-        }elseif (Sentinel::inRole('admin')) {
+        }elseif (Sentinel::inRole('admin') || Sentinel::inRole('super-admin')) {
             $first_admin = Sentinel::getUser();
         }
 
