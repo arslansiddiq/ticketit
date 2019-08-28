@@ -12,7 +12,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-sm-12">
-                    @if(!$u->isAdmin() && !$u->isAgent())
+                    @if(!$u->isAdmin() && !$u->isAgent)
                     <div class="form-group">
                         {!! CollectiveForm::text('subject', $ticket->subject, ['class' => 'form-control', 'required']) !!}
                     </div>
@@ -27,7 +27,6 @@
                             {!! CollectiveForm::select('priority_id', $priority_lists, $ticket->priority_id, ['class' => 'form-control']) !!}
                         </div>
                     </div>
-                    @if (!$u->isAdmin() && !$u->isAgent())
                     <div class="form-group col-lg-6">
                         {!! CollectiveForm::label('agent_id', trans('ticketit::lang.agent') . trans('ticketit::lang.colon'), [
                             'class' => 'col-lg-4 control-label'
@@ -41,7 +40,6 @@
                             </div>
                         </div>
                     </div>
-                    @endif
 
                     <div class="clearfix"></div>
 
@@ -54,17 +52,14 @@
                             </div>
                         </div>
                     </div>
-                    @if (!$u->isAdmin())
-                        {{-- expr --}}
-                        <div class="form-group col-lg-12">
-                            {!! CollectiveForm::label('status_id', trans('ticketit::lang.status') . trans('ticketit::lang.colon'), [
-                                'class' => 'col-lg-6 control-label'
-                            ]) !!}
-                            <div class="col-lg-6">
-                                {!! CollectiveForm::select('status_id', $status_lists, $ticket->status_id, ['class' => 'form-control']) !!}
-                            </div>
+                    <div class="form-group col-lg-12">
+                        {!! CollectiveForm::label('status_id', trans('ticketit::lang.status') . trans('ticketit::lang.colon'), [
+                            'class' => 'col-lg-6 control-label'
+                        ]) !!}
+                        <div class="col-lg-6">
+                            {!! CollectiveForm::select('status_id', $status_lists, $ticket->status_id, ['class' => 'form-control']) !!}
                         </div>
-                    @endif
+                    </div>
 
                     <div class="clearfix"></div>
 
