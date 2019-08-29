@@ -12,14 +12,14 @@
             </div>
             <div class="modal-body">
                 <div class="col-sm-12">
-                    @if(!$u->isAdmin() && !$u->isAgent)
+                    {{-- @if(!$u->isAdmin() && !$u->isAgent) --}}
                     <div class="form-group">
                         {!! CollectiveForm::text('subject', $ticket->subject, ['class' => 'form-control', 'required']) !!}
                     </div>
                     <div class="form-group">
                         <textarea class="form-control summernote-editor" rows="5" required name="content" cols="50">{!! htmlspecialchars($ticket->html) !!}</textarea>
                     </div>
-                    @endif
+                    {{-- @endif --}}
 
                     <div class="form-group col-lg-6">
                         {!! CollectiveForm::label('priority_id', trans('ticketit::lang.priority') . trans('ticketit::lang.colon'), ['class' => 'col-lg-4 control-label']) !!}
