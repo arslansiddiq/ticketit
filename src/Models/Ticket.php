@@ -216,7 +216,7 @@ class Ticket extends Model
      *
      * @return Ticket
      */
-    public function autoSelectAgent($for = null)
+    public function autoSelectAgent($for = 'superadmin')
     {
         $cat_id = $this->category_id;
         // $agents = Category::find($cat_id)->agents()->with(['agentOpenTickets' => function ($query) {
