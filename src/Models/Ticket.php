@@ -16,6 +16,7 @@ class Ticket extends Model
 
     protected $table = 'ticketit';
     protected $dates = ['completed_at'];
+    protected $appends = ['email_content'];
 
     /**
      * List of completed tickets.
@@ -262,4 +263,14 @@ class Ticket extends Model
 
         return $this;
     }
+
+    /**
+     * Get Email Content Strip Img Tags from HMTL
+     * @return String
+     */
+    public function getEmailContentAttribute()
+    {
+        return $this->emailContent();
+    }
+    
 }

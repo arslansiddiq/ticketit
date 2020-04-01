@@ -20,6 +20,6 @@
 	    'subject'   =>  $ticket->subject,
 	    'status'    =>  $ticket->status->name,
 	    'category'  =>  $ticket->category->name,
-	    'comment'   =>  $comment->html
+	    'comment'   =>  $comment->email_content
 	]) !!}
 @stop

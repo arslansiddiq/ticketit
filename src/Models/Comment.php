@@ -13,6 +13,7 @@ class Comment extends Model
 
     protected $table = 'ticketit_comments';
 
+    protected $appends = ['email_content'];
     /**
      * Get related ticket.
      *
@@ -32,4 +33,14 @@ class Comment extends Model
     {
         return $this->belongsTo('App\User', 'user_id');
     }
+
+    /**
+     * Get Content HTML for Email Strip IMG tag from html
+     * @return string
+     */
+    public function getEmailContentAttribute()
+    {
+        return $this->emailContent();
+    }
+    
 }

@@ -128,7 +128,7 @@
       <tr>
           <td style="color:#933f24;">
               {{ $setting->grab('email.signoff') }}<br>
-              {{ $setting->grab('email.signature') }}
+             {{--  {{ $setting->grab('email.signature') }} --}}
               <br><br>
           </td>
       </tr>
@@ -144,8 +144,8 @@
                           <w:anchorlock/>
                           <center>
                             <![endif]-->
-                            <a href="{{ url($setting->grab('admin_route')) }}"
-                            style="background-color:{{ $setting->grab('email.color_button_bg') }};border-radius:4px;color:#ffffff;display:inline-block;font-family: Helvetica, Arial, sans-serif;font-size:16px;font-weight:bold;line-height:50px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;">{{ $setting->grab('email.dashboard') }}</a>
+                           {{--  <a href="{{ url($setting->grab('admin_route')) }}"
+                            style="background-color:{{ $setting->grab('email.color_button_bg') }};border-radius:4px;color:#ffffff;display:inline-block;font-family: Helvetica, Arial, sans-serif;font-size:16px;font-weight:bold;line-height:50px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;">{{ $setting->grab('email.dashboard') }}</a> --}}
                         <!--[if mso]>
                           </center>
                         </v:roundrect>
