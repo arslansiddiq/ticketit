@@ -13,6 +13,7 @@ use Kordy\Ticketit\Models\Category;
 use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Models\Ticket;
 use Sentinel;
+use DB;
 
 class TicketsController extends Controller
 {
@@ -76,7 +77,8 @@ class TicketsController extends Controller
                 'ticketit.id AS agent',
                 'ticketit.updated_at AS updated_at',
                 'ticketit_priorities.name AS priority',
-                'users.name AS owner',
+                // 'users.name AS owner',
+                DB::raw('CONCAT(users.first_name ," ", users.last_name) as owner'),
                 'ticketit.agent_id',
                 'ticketit_categories.name AS category',
             ]);

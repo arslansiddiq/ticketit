@@ -17,8 +17,21 @@ trait Purifiable
     public function setPurifiedContent($rawHtml)
     {
         $this->content = Purifier::clean($rawHtml, ['HTML.Allowed' => '']);
-        // $this->html = Purifier::clean($rawHtml, TSetting::grab('purifier_config'));
-        $this->html = $rawHtml;
+        $config = array (
+          'HTML.SafeIframe' => 'true',
+          'URI.SafeIframeRegexp' => '%^(http://|https://|//)(www.youtube.com/embed/|player.vimeo.com/video/)%',
+          'HTML.Allowed' => 'div,b,strong,i,em,u,a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
+          'URI.MungeResources' => true,
+          'URI.AllowedSchemes' => 
+          array (
+            'http' => true,
+            'https' => true,
+            'mailto' => true,
+            'data' => true,
+            'cid' => true,
+          ),
+        );
+        $this->html = Purifier::clean($rawHtml, $config);
         return $this;
     }
 }
