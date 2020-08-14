@@ -106,6 +106,11 @@ class NotificationsController extends Controller
             $to = $ticket->agent;
         }
 
+        if(env('TICKET_SYSTEM', 'prod') == 'dev'){
+            $to = ['email' => env('DEVELOPER_EMAIL',''), 'name' => 'Ticket Testing'];
+            $to = (object) $to;
+        }
+
         if (LaravelVersion::lt('5.4')) {
             $mail_callback = function ($m) use ($to, $notification_owner, $subject) {
                 $m->to($to->email, $to->name);

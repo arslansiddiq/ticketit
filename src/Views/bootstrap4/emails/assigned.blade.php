@@ -17,6 +17,7 @@
 	{!! trans('ticketit::email/assigned.data', [
 		'name'      =>  $notification_owner->name,
 		'subject'   =>  $ticket->subject,
+		'id'		=>	$ticket->id,
 		'status'    =>  $ticket->status->name,
 		'category'  =>  $ticket->category->name,
 		'content'	=>	$ticket->email_content
