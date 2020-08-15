@@ -112,9 +112,9 @@ class NotificationsController extends Controller
         }
 
         $to = [$to];
-        $zapp =  (object)['email' => env('TICKETS_SECOND_EMAIL'), 'name' => env('APP_NAME')];
+        $zapp =  (object)['email' => env('TICKETS_SECOND_EMAIL',''), 'name' => env('APP_NAME')];
         array_push($to, $zapp);
-        
+
         if (LaravelVersion::lt('5.4')) {
             $mail_callback = function ($m) use ($to, $notification_owner, $subject) {
                 $m->to($to->email, $to->name);
