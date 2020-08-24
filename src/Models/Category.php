@@ -10,6 +10,8 @@ class Category extends Model
 
     protected $fillable = ['name', 'color'];
 
+    protected $appends = ['label'];
+
     /**
      * Indicates that this model should not be timestamped.
      *
@@ -36,4 +38,38 @@ class Category extends Model
     {
         return $this->belongsToMany('\Kordy\Ticketit\Models\Agent', 'ticketit_categories_users', 'category_id', 'user_id');
     }
+
+    /**
+     * Get Sub categories of main category 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function children()
+    {
+      return $this->hasMany('Kordy\Ticketit\Models\Category', 'parent', 'id' );
+    }
+
+    /**
+     * Get parent category
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function parent_category()
+    {
+        return $this->hasOne('Kordy\Ticketit\Models\Category', 'id', 'parent' );
+    }
+
+    /**
+     * Return Label for select Box
+     * @return string
+     */
+    public function getLabelAttribute()
+    {
+        if($this->parent !== null){
+            return $this->parent_category->name.' - '.$this->name;
+        }else{
+            return $this->name;
+        }
+
+    }
+    
+    
 }
