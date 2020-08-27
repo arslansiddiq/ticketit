@@ -45,4 +45,51 @@
         });
     </script>
     @include('ticketit::tickets.partials.summernote')
+
+    <script>
+        $('document').ready(function(){
+            var subcategories = {!! json_encode($subcategories) !!};
+            console.log(subcategories);
+            let val = $('.cat option:selected').val();
+
+            var options = ''
+            subcategories[val].forEach(function(item, index){
+                options += '<option value="'+item.id+'">'+item.name+'</option>'
+            });
+             
+            let el =   '<label for="subcategory" class="col-lg-6 control-label">Sub Category: </label>'
+                el +=       '<div class="col-lg-6">';
+                el +=           '<select class="form-control" required="required" name="subcategory_id">';
+
+                el +=               options;
+
+                el +=           '</select>';
+                el +=       '</div>';
+                                
+            $('.subcat').html(el);
+        });
+
+        function selectCategory(ev){
+            console.log(ev);
+            var subcategories = {!! json_encode($subcategories) !!};
+            if(subcategories[ev]){
+                var options = ''
+                subcategories[ev].forEach(function(item, index){
+                    options += '<option value="'+item.id+'">'+item.name+'</option>'
+                });
+                let el =   '<label for="subcategory" class="col-lg-6 control-label">Sub Category: </label>'
+                    el +=       '<div class="col-lg-6">';
+                    el +=           '<select class="form-control" required="required" name="subcategory_id">';
+
+                    el +=              options;
+
+                    el +=           '</select>';
+                    el +=       '</div>';
+                                    
+                $('.subcat').html(el);
+            }else{
+                $('.subcat').html('');
+            }
+        }
+    </script>
 @append

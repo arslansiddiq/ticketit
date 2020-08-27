@@ -19,7 +19,9 @@
 		'subject'   =>  $ticket->subject,
 		'id'		=>	$ticket->id,
 		'status'    =>  $ticket->status->name,
-		'category'  =>  $ticket->category->name,
+		'category'  =>  ($ticket->category->parent_category) ? $ticket->category->parent_category->name : $ticket->category->name,
+		'sub_category' => ($ticket->category->parent_category) ? $ticket->category->name : null,
+		'priority' => $ticket->priority->name,
 		'content'	=>	$ticket->email_content
 	]) !!}
 @stop

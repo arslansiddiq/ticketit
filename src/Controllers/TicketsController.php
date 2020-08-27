@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Cache;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Kordy\Ticketit\Helpers\LaravelVersion;
 use Kordy\Ticketit\Models;
 use Kordy\Ticketit\Models\Agent;
@@ -175,17 +176,26 @@ class TicketsController extends Controller
         });
 
         $categories = Cache::remember('ticketit::categories', 60, function () {
-            return Models\Category::all();
+            return Models\Category::whereNull('parent')->get();
         });
+
+        $subcategories = [];
+        foreach ($categories as $category) {
+            if($category->children->count()){
+                $subcategories[$category->id] = $category->children;
+            }else{
+                $subcategories[$category->id] = null;
+            }
+        }
 
         $statuses = Cache::remember('ticketit::statuses', 60, function () {
             return Models\Status::all();
         });
 
         if (LaravelVersion::min('5.3.0')) {
-            return [$priorities->pluck('name', 'id'), $categories->pluck('label', 'id'), $statuses->pluck('name', 'id')];
+            return [$priorities->pluck('name', 'id'), $categories->pluck('label', 'id'), $statuses->pluck('name', 'id'), $subcategories];
         } else {
-            return [$priorities->lists('name', 'id'), $categories->lists('label', 'id'), $statuses->lists('name', 'id')];
+            return [$priorities->lists('name', 'id'), $categories->lists('label', 'id'), $statuses->lists('name', 'id'), $subcategories];
         }
     }
 
@@ -196,9 +206,8 @@ class TicketsController extends Controller
      */
     public function create()
     {
-        list($priorities, $categories) = $this->PCS();
-
-        return view('ticketit::tickets.create', compact('priorities', 'categories'));
+        list($priorities, $categories, $statuses, $subcategories) = $this->PCS();
+        return view('ticketit::tickets.create', compact('priorities', 'categories', 'subcategories'));
     }
 
     /**
@@ -221,10 +230,20 @@ class TicketsController extends Controller
 
         $ticket->subject = $request->subject;
 
-        $ticket->setPurifiedContent($request->get('content'));
+        $content = $this->imagesToLink($request->get('content'));
+
+        $ticket->setPurifiedContent($content);
+
+        $category = Models\Category::find($request->category_id);
+
+        if($category->children->count())
+        {
+            $ticket->category_id = $request->subcategory_id;
+        }else{
+            $ticket->category_id = $request->category_id;
+        }
 
         $ticket->priority_id = $request->priority_id;
-        $ticket->category_id = $request->category_id;
 
         $ticket->status_id = TSetting::grab('default_status_id');
         $ticket->user_id = Sentinel::getUser()->id;
@@ -252,7 +271,7 @@ class TicketsController extends Controller
     {
         $ticket = $this->tickets->findOrFail($id);
 
-        list($priority_lists, $category_lists, $status_lists) = $this->PCS();
+        list($priority_lists, $category_lists, $status_lists, $subcategories) = $this->PCS();
 
         $close_perm = $this->permToClose($id);
         $reopen_perm = $this->permToReopen($id);
@@ -279,7 +298,7 @@ class TicketsController extends Controller
         $comments = $ticket->comments()->paginate(TSetting::grab('paginate_items'));
 
         return view('ticketit::tickets.show',
-            compact('ticket', 'status_lists', 'priority_lists', 'category_lists', 'agent_lists', 'comments',
+            compact('ticket', 'status_lists', 'priority_lists', 'category_lists', 'subcategories', 'agent_lists', 'comments',
                 'close_perm', 'reopen_perm'));
     }
 
@@ -306,10 +325,20 @@ class TicketsController extends Controller
 
         $ticket->subject = $request->subject;
 
-        $ticket->setPurifiedContent($request->get('content'));
+        $content = $this->imagesToLink($request->get('content'));
+
+        $ticket->setPurifiedContent($content);
 
         $ticket->status_id = $request->status_id;
-        $ticket->category_id = $request->category_id;
+
+        $category = Models\Category::find($request->category_id);
+        if($category->children->count())
+        {
+            $ticket->category_id = $request->subcategory_id;
+        }else{
+            $ticket->category_id = $request->category_id;
+        }
+
         $ticket->priority_id = $request->priority_id;
 
         if ($request->input('agent_id') == 'auto') {
@@ -549,4 +578,46 @@ class TicketsController extends Controller
 
         return $performance_average;
     }
+
+    /**
+     * Filter Base64 Images Download Images and make there links
+     * @return String | content
+     */
+    protected function imagesToLink($input_content)
+    {
+        $description = $input_content;
+        $dom = new \DomDocument();
+        $dom->loadHtml($description, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);    
+        $images = $dom->getElementsByTagName('img');
+        foreach($images as $k => $img)
+        {
+           $data = $img->getAttribute('src');
+           if(Str::contains($data, ';base64')){
+               list($type, $data) = explode(';', $data);
+               list(, $data)      = explode(',', $data);
+               $data = base64_decode($data);
+               $image_name= "/tickets_images/" . time().$k.'.png';
+               $path = public_path() . $image_name;
+               file_put_contents($path, $data);
+               $img->removeAttribute('src');
+               $img->setAttribute('src', url($image_name));
+           }
+        }
+        $description = $dom->saveHTML();
+        $pattern = '/<img.+src=(.)(.*)\1[^>]*>/iU';
+        $callback_fn = 'imgToa';
+        $content = preg_replace_callback($pattern, array(&$this,"imgToa"), $description);
+        return $content;
+    }
+
+    /**
+     * Replace Images Tags into Anchor tags
+     * @return String
+     */
+    protected function imgToa($matches)
+    {
+        return "<a target='_blank' href='".$matches[2]."'> <font color ='black' >View Image</font></a>";
+    }
+    
+    
 }

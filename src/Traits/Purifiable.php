@@ -20,7 +20,7 @@ trait Purifiable
         $config = array (
           'HTML.SafeIframe' => 'true',
           'URI.SafeIframeRegexp' => '%^(http://|https://|//)(www.youtube.com/embed/|player.vimeo.com/video/)%',
-          'HTML.Allowed' => 'div,b,strong,i,em,u,a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
+          'HTML.Allowed' => 'div,b,strong,i,em,u,a[href|title|target],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
           'URI.MungeResources' => true,
           'URI.AllowedSchemes' => 
           array (
@@ -45,7 +45,7 @@ trait Purifiable
         $config = array (
           'HTML.SafeIframe' => 'true',
           'URI.SafeIframeRegexp' => '%^(http://|https://|//)(www.youtube.com/embed/|player.vimeo.com/video/)%',
-          'HTML.Allowed' => 'div,b,strong,i,em,u,a[href|title],ul,ol,li,p[style],br,span[style]',
+          'HTML.Allowed' => 'div,b,strong,i,em,u,a[href|title|target],ul,ol,li,p[style],br,span[style]',
           'URI.MungeResources' => true,
           'URI.AllowedSchemes' => 
           array (

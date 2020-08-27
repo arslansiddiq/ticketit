@@ -49,6 +49,7 @@ return [
 
   'agent'                            => 'Agent',
   'category'                         => 'Category',
+  'subcategory'                      => 'Sub Category',
   'colon'                            => ': ',
   'comments'                         => 'Comments',
   'created'                          => 'Created',
