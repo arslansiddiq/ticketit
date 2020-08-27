@@ -15,15 +15,15 @@ class NotificationsController extends Controller
     public function newComment(Comment $comment)
     {
         $ticket = $comment->ticket;
-        $notification_owner = $comment->user;
+        $notification_owner = $comment->ticket->user;
         $template = 'ticketit::emails.comment';
         $data = ['comment' => serialize($comment), 'ticket' => serialize($ticket)];
 
         // //Send Notification to Agent
-        // if($ticket->agent->email !== Sentinel::getUser()->email){
-        //     $this->sendNotification($template, $data, $ticket, $notification_owner,
-        //         trans('ticketit::lang.notify-new-comment-from').$notification_owner->name.trans('ticketit::lang.notify-on').$ticket->subject, 'comment');
-        // }
+        if($ticket->agent->email !== Sentinel::getUser()->email){
+            $this->sendNotification($template, $data, $ticket, $ticket->agent,
+                trans('ticketit::lang.notify-new-comment-from').$ticket->agent->name.trans('ticketit::lang.notify-on').$ticket->subject, 'comment');
+        }
         
         if($notification_owner->email !== Sentinel::getUser()->email){
             $this->sendNotification($template, $data, $ticket, $notification_owner,

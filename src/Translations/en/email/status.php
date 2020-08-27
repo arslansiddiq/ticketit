@@ -2,6 +2,10 @@
 
 return [
 
-'data' => '<b>:name</b> changed the status of "#:id :subject" from :old_status to :new_status<br>',
+'data' => '
+	User <b>:name</b>
+	Ticket#: <b>:id</b> 
+	Title: <b>:subject</b>
+	From <b>:old_status</b> to <b>:new_status</b><br>',
 
 ];

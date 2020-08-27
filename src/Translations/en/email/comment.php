@@ -3,10 +3,14 @@
 return [
 
 'data' => '
-	<b>:name</b> commented on ticket: <b>#:id :subject</b> created by (:owner)<br>
-	<b>Ticket category:</b> :category - <b>status:</b> :status<br>
+	User: <b>:name</b><br>
+	Ticket: <b>#:id </b><br>
+	Title :<b>:subject</b><br>
+	Created by (:owner)<br>
+	Category: <b>:category</b><br>
+	Status: <b> :status</b><br>
 	<br>
-	<div><b>:comment</b></div><br>
+	<div>:comment</div><br>
 ',
 
 ];

@@ -590,7 +590,7 @@ class TicketsController extends Controller
     {
         $description = $input_content;
         $dom = new \DomDocument();
-        $dom->loadHtml($description, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);    
+        $dom->loadHtml($description, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING);    
         $images = $dom->getElementsByTagName('img');
         foreach($images as $k => $img)
         {
