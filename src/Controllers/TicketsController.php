@@ -295,10 +295,13 @@ class TicketsController extends Controller
             $agent_lists = ['auto' => 'Auto Select'];
         }
 
+        $selected_category = ($ticket->category->parent_category) ? $ticket->category->parent_category->id : $ticket->category->id;
+        $selected_subcategory = ($ticket->category->parent_category) ? $ticket->category->id : null;
+
         $comments = $ticket->comments()->paginate(TSetting::grab('paginate_items'));
 
         return view('ticketit::tickets.show',
-            compact('ticket', 'status_lists', 'priority_lists', 'category_lists', 'subcategories', 'agent_lists', 'comments',
+            compact('ticket', 'status_lists', 'priority_lists', 'category_lists', 'subcategories', 'selected_category', 'selected_subcategory', 'agent_lists', 'comments',
                 'close_perm', 'reopen_perm'));
     }
 

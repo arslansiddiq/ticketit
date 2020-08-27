@@ -72,12 +72,27 @@
                         </div>
                         <div class="col-md-6">
                             <p> <strong>{{ trans('ticketit::lang.responsible') }}</strong>{{ trans('ticketit::lang.colon') }}{{ $ticket->agent_id == $u->id ? $u->name : $ticket->agent->name }}</p>
-                            <p>
-                                <strong>{{ trans('ticketit::lang.category') }}</strong>{{ trans('ticketit::lang.colon') }}
-                                <span style="color: {{ $ticket->category->color }}">
-                                    {{ $ticket->category->name }}
-                                </span>
-                            </p>
+                            @if($ticket->category->parent_category)
+                                <p>
+                                    <strong>{{ trans('ticketit::lang.category') }}</strong>{{ trans('ticketit::lang.colon') }}
+                                    <span style="color: {{ $ticket->category->parent_category->color }}">
+                                        {{ $ticket->category->parent_category->name }}
+                                    </span>
+                                </p>
+                                <p>
+                                    <strong>{{ trans('ticketit::lang.subcategory') }}</strong>{{ trans('ticketit::lang.colon') }}
+                                    <span style="color: {{ $ticket->category->color }}">
+                                        {{ $ticket->category->name }}
+                                    </span>
+                                </p>
+                            @else
+                                <p>
+                                    <strong>{{ trans('ticketit::lang.category') }}</strong>{{ trans('ticketit::lang.colon') }}
+                                    <span style="color: {{ $ticket->category->color }}">
+                                        {{ $ticket->category->name }}
+                                    </span>
+                                </p>
+                            @endif
                             <p> <strong>{{ trans('ticketit::lang.created') }}</strong>{{ trans('ticketit::lang.colon') }}{{ $ticket->created_at->diffForHumans() }}</p>
                             <p> <strong>{{ trans('ticketit::lang.last-update') }}</strong>{{ trans('ticketit::lang.colon') }}{{ $ticket->updated_at->diffForHumans() }}</p>
                         </div>

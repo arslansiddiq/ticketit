@@ -49,47 +49,45 @@
     <script>
         $('document').ready(function(){
             var subcategories = {!! json_encode($subcategories) !!};
-            console.log(subcategories);
             let val = $('.cat option:selected').val();
 
-            var options = ''
-            subcategories[val].forEach(function(item, index){
-                options += '<option value="'+item.id+'">'+item.name+'</option>'
-            });
-             
-            let el =   '<label for="subcategory" class="col-lg-6 control-label">Sub Category: </label>'
-                el +=       '<div class="col-lg-6">';
-                el +=           '<select class="form-control" required="required" name="subcategory_id">';
-
-                el +=               options;
-
-                el +=           '</select>';
-                el +=       '</div>';
-                                
-            $('.subcat').html(el);
-        });
-
-        function selectCategory(ev){
-            console.log(ev);
-            var subcategories = {!! json_encode($subcategories) !!};
-            if(subcategories[ev]){
-                var options = ''
-                subcategories[ev].forEach(function(item, index){
-                    options += '<option value="'+item.id+'">'+item.name+'</option>'
-                });
-                let el =   '<label for="subcategory" class="col-lg-6 control-label">Sub Category: </label>'
-                    el +=       '<div class="col-lg-6">';
-                    el +=           '<select class="form-control" required="required" name="subcategory_id">';
-
-                    el +=              options;
-
-                    el +=           '</select>';
-                    el +=       '</div>';
-                                    
-                $('.subcat').html(el);
+            if(typeof(subcategories[val]) !== 'undefined' && subcategories[val] !== '' && subcategories[val] !== null){
+                $('.subcat').html(generateDropdown(val,subcategories));
             }else{
                 $('.subcat').html('');
             }
+        });
+
+        function selectCategory(ev){
+            var subcategories = {!! json_encode($subcategories) !!};
+            if(typeof(subcategories[ev]) !== 'undefined' && subcategories[ev] !== '' && subcategories[ev] !== null){
+                $('.subcat').html(generateDropdown(ev,subcategories));
+            }else{
+                $('.subcat').html('');
+            }
+        }
+
+        // generate Dropdown Element HTML
+        function generateDropdown(id,subcategories)
+        {
+            var seleted_ = "{{ $selected_subcategory }}"
+            var options = ''
+            subcategories[id].forEach(function(item, index){
+                if(seleted_ == item.id){
+                    options += '<option selected="selected" value="'+item.id+'">'+item.name+'</option>'
+                }else{
+                    options += '<option value="'+item.id+'">'+item.name+'</option>'
+                }
+            });
+            let el =   '<label for="subcategory" class="col-lg-6 control-label">Sub Category: </label>'
+                el +=       '<div class="col-lg-6">';
+                el +=           '<select class="form-control" required="required" name="subcategory_id">';
+                el +=               '<option selected="selected" value="">Please Select</option>';
+                el +=              options;
+
+                el +=           '</select>';
+                el +=       '</div>';
+            return el;
         }
     </script>
 @append

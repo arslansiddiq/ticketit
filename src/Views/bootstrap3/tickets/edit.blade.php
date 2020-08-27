@@ -48,7 +48,7 @@
                             'class' => 'col-lg-6 control-label'
                         ]) !!}
                         <div class="col-lg-6">
-                            {!! CollectiveForm::select('category_id', $category_lists, $ticket->category_id, ['class' => 'form-control cat', 'onchange' => 'selectCategory(this.value)']) !!}
+                            {!! CollectiveForm::select('category_id', $category_lists, $selected_category, ['class' => 'form-control cat', 'onchange' => 'selectCategory(this.value)']) !!}
                             </div>
                         </div>
                     </div>
