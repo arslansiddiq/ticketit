@@ -5,6 +5,7 @@ namespace Kordy\Ticketit\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Kordy\Ticketit\Models;
+use Kordy\Ticketit\Controllers\NotificationsController;
 
 class CommentsController extends Controller
 {
@@ -48,6 +49,17 @@ class CommentsController extends Controller
             'content'     => 'required|min:6',
         ]);
 
+        if($request->has('status_change') && $request->get('status_change')){
+            // check if status realy changed then send combined email otherwise send only comment do other wise
+            $ticket = Models\Ticket::find($request->get('ticket_id'));
+            if($ticket->status->id !== (int)$request->get('status_change')){
+                session(['com_stat_both' => true]);
+            }else{
+                session(['com_stat_both' => false]);
+            }
+
+        }
+
         $comment = new Models\Comment();
 
         $comment->setPurifiedContent($request->get('content'));
@@ -56,9 +68,23 @@ class CommentsController extends Controller
         $comment->user_id = \Sentinel::getuser()->id;
         $comment->save();
 
-        $ticket = Models\Ticket::find($comment->ticket_id);
-        $ticket->updated_at = $comment->created_at;
-        $ticket->save();
+        if(session('com_stat_both', false)){
+
+            $original_ticket = Models\Ticket::find($comment->ticket_id);
+            $ticket = Models\Ticket::find($comment->ticket_id);
+            $ticket->status_id = $request->get('status_change');
+            $ticket->updated_at = $comment->created_at;
+            $ticket->save();
+
+            $notification = new NotificationsController();
+            $notification->newCommentAndStatus($comment, $ticket, $original_ticket);
+
+            session(['com_stat_both' => false]);
+        }else{
+            $ticket = Models\Ticket::find($comment->ticket_id);
+            $ticket->updated_at = $comment->created_at;
+            $ticket->save();
+        }
 
         return back()->with('status', trans('ticketit::lang.comment-has-been-added-ok'));
     }

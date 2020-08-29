@@ -45,7 +45,7 @@
         });
     </script>
     @include('ticketit::tickets.partials.summernote')
-
+{{-- {!! json_encode($status_lists) !!} --}}
     <script>
         $('document').ready(function(){
             var subcategories = {!! json_encode($subcategories) !!};
@@ -56,6 +56,38 @@
             }else{
                 $('.subcat').html('');
             }
+
+            // Form Submit Handling
+            $(".comment-form").submit(function( event ) {
+              event.preventDefault();
+              let sel_el = generateStatusesSelectBox();
+              Swal.fire({
+                      title: 'Do you want to change the status of this ticket?',
+                      html: sel_el +
+                          "<br><br><div class='row col-lg-12' style='margin-top: 20px;'>" +
+                          '<button type="button" role="button" tabindex="0" class="btn btn-danger skip-pop">' + 'Skip' + '</button>' +
+                          '<button type="button" role="button" tabindex="0" class="btn btn-primary submit-pop">' + 'Submit' + '</button></div>',
+                      showCancelButton: false,
+                      showConfirmButton: false
+                  });
+            });
+            $(document).on('click', '.submit-pop', function(e) {
+                e.preventDefault();
+                let value = $('.selected_status option:selected').val();
+                console.log(value);
+                $('.status_change').val(value);
+                console.log('Submit clicked!!!!!!');
+                $(".comment-form").off().submit();
+                Swal.close();
+            });
+            $(document).on('click', '.skip-pop', function(e) {
+                e.preventDefault();
+                $('.status_change').val(null);
+                console.log('Submit clicked!!!!!!');
+                $(".comment-form").off().submit();
+                Swal.close();
+            });
+            
         });
 
         function selectCategory(ev){
@@ -89,5 +121,22 @@
                 el +=       '</div>';
             return el;
         }
+
+        function generateStatusesSelectBox(){
+            var statuses = {!! json_encode($status_lists) !!}
+            var options = ''
+            Object.keys(statuses).forEach(key => {
+                options += '<option value="'+key+'">'+statuses[key]+'</option>'
+            });
+            let el =   '<label for="status-popup" class="col-lg-12 control-label">Select Status: </label>'
+                el +=       '<div class="col-lg-12">';
+                el +=           '<select class="form-control selected_status" name="selected_status">';
+                el +=               '<option selected="selected" value="">Please Select</option>';
+                el +=              options;
+                el +=           '</select>';
+                el +=       '</div>';
+            return el;
+        }
+        // Reply Submit if user is agent or Super Admin
     </script>
 @append

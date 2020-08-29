@@ -280,7 +280,7 @@ class TicketsController extends Controller
             $first_admin = Sentinel::getUser()->admin_user;
         }elseif (Sentinel::inRole('admin')) {
             $first_admin = Sentinel::getUser();
-        }elseif(Sentinel::inRole('ticket-agent')){
+        }elseif(Sentinel::inRole('agent')){
             $first_admin = Sentinel::getUser()->admin_user;
         }elseif(Sentinel::inRole('super-admin')){
             $first_admin = Sentinel::findRoleBySlug('super-admin')->users()->first();
@@ -289,6 +289,7 @@ class TicketsController extends Controller
         $cat_agents = Models\Category::find($ticket->category_id)->agents()->where('parent_user_id',$first_admin->id)->agentsLists();
 
         // $cat_agents = Models\Category::find($ticket->category_id)->agents()->agentsLists();
+        // dd($cat_agents);
         if (is_array($cat_agents)) {
             $agent_lists = ['auto' => 'Auto Select'] + $cat_agents;
         } else {

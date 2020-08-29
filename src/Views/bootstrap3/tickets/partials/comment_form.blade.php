@@ -1,9 +1,13 @@
 <div class="panel panel-default">
     <div class="panel-body">
-        {!! CollectiveForm::open(['method' => 'POST', 'route' => $setting->grab('main_route').'-comment.store', 'class' => 'form-horizontal']) !!}
-
-
+        @if(!$u->isAdmin() && !$u->isAgent())
+            {!! CollectiveForm::open(['method' => 'POST', 'route' => $setting->grab('main_route').'-comment.store', 'class' => 'form-horizontal']) !!}
+        @else
+            {!! CollectiveForm::open(['method' => 'POST', 'route' => $setting->grab('main_route').'-comment.store', 'class' => 'form-horizontal comment-form']) !!}
+        @endif
+        
             {!! CollectiveForm::hidden('ticket_id', $ticket->id ) !!}
+            {!! CollectiveForm::hidden('status_change', null ,['class' => 'status_change']) !!}
 
             <fieldset>
                 <legend>{!! trans('ticketit::lang.reply') !!}</legend>
@@ -13,9 +17,18 @@
                     </div>
                 </div>
 
-                <div class="text-right col-md-12">
+                @if(!$u->isAdmin() && !$u->isAgent())
+                    <div class="text-right col-md-12">
+                        {!! CollectiveForm::submit( trans('ticketit::lang.btn-submit'), ['class' => 'btn btn-primary reply-submit']) !!}
+                    </div>
+                @else
+                    <div class="text-right col-md-12">
+                        {!! CollectiveForm::submit( trans('ticketit::lang.btn-submit'), ['class' => 'btn btn-primary']) !!}
+                    </div>
+                @endif
+                {{-- <div class="text-right col-md-12">
                     {!! CollectiveForm::submit( trans('ticketit::lang.btn-submit'), ['class' => 'btn btn-primary']) !!}
-                </div>
+                </div> --}}
 
             </fieldset>
         {!! CollectiveForm::close() !!}

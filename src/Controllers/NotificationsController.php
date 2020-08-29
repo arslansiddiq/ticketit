@@ -41,7 +41,6 @@ class NotificationsController extends Controller
             'notification_owner' => serialize($notification_owner),
             'original_ticket'    => serialize($original_ticket),
         ];
-
         if (strtotime($ticket->completed_at)) {
             $this->sendNotification($template, $data, $ticket, $notification_owner,
                 $notification_owner->name.trans('ticketit::lang.notify-updated').$ticket->subject.trans('ticketit::lang.notify-status-to-complete'), 'status');
@@ -80,6 +79,26 @@ class NotificationsController extends Controller
         $this->sendNotification($template, $data, $ticket, $notification_owner,
             $notification_owner->name.trans('ticketit::lang.notify-created-ticket').$ticket->subject, 'new-ticket-zapier');
 
+    }
+
+    public function newCommentAndStatus(Comment $comment, Ticket $ticket, Ticket $original_ticket)
+    {
+        $notification_owner = Sentinel::getUser();
+        $template = 'ticketit::emails.comment-status';
+        $data = [
+            'comment'            => serialize($comment),
+            'ticket'             => serialize($ticket),
+            'notification_owner' => serialize($notification_owner),
+            'original_ticket'    => serialize($original_ticket),
+        ];
+        // dd($original_ticket);
+        if (strtotime($ticket->completed_at)) {
+            $this->sendNotification($template, $data, $ticket, $notification_owner,
+                $notification_owner->name.trans('ticketit::lang.comment-notify-updated').$ticket->subject.trans('ticketit::lang.notify-status-to-complete'), 'status');
+        } else {
+            $this->sendNotification($template, $data, $ticket, $notification_owner,
+                $notification_owner->name.trans('ticketit::lang.comment-notify-updated').$ticket->subject.trans('ticketit::lang.notify-status-to').$ticket->status->name, 'status');
+        }
     }
 
     /**

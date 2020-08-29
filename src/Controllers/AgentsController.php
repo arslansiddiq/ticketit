@@ -60,7 +60,7 @@ class AgentsController extends Controller
         $user_info->password = bcrypt($request->get('password'));
         $user_info->save();
 
-        $role = Sentinel::findRoleByName('Ticket Agent');
+        $role = Sentinel::findRoleByName('Agent');
 
         $role->users()->attach($user_info);
 
