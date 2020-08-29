@@ -74,7 +74,12 @@ class NotificationsController extends Controller
             'notification_owner' => serialize($notification_owner),
         ];
         $this->sendNotification($template, $data, $ticket, $notification_owner,
-            $notification_owner->name.trans('ticketit::lang.notify-created-ticket').$ticket->subject, 'agent');
+            $notification_owner->name.trans('ticketit::lang.notify-created-ticket').$ticket->subject, 'new-ticket');
+
+        $template = 'ticketit::emails.assigned-zapier';
+        $this->sendNotification($template, $data, $ticket, $notification_owner,
+            $notification_owner->name.trans('ticketit::lang.notify-created-ticket').$ticket->subject, 'new-ticket-zapier');
+
     }
 
     /**
@@ -93,6 +98,9 @@ class NotificationsController extends Controller
         $to = null;
         if($type == 'comment'){
             $to = $notification_owner;
+        }
+        if($type == 'new-ticket'){
+            $to = $ticket->agent;
         }
         else if ($type !== 'agent') {
             $to = $ticket->user;
@@ -114,9 +122,13 @@ class NotificationsController extends Controller
             $to = (object) $to;
         }
 
-        $to = [$to];
-        $zapp =  (object)['email' => env('TICKETS_SECOND_EMAIL',''), 'name' => env('APP_NAME')];
-        array_push($to, $zapp);
+        if($type == 'new-ticket-zapier'){
+            // $to = [$to];
+            $zapp =  (object)['email' => env('TICKETS_SECOND_EMAIL',''), 'name' => env('APP_NAME')];
+            // array_push($to, $zapp);
+            $to = $zapp;
+        }
+
 
         if (LaravelVersion::lt('5.4')) {
             $mail_callback = function ($m) use ($to, $notification_owner, $subject) {
