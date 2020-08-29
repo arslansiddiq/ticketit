@@ -91,8 +91,10 @@ class NotificationsController extends Controller
          * @var User
          */
         $to = null;
-
-        if ($type != 'agent') {
+        if($type == 'comment'){
+            $to = $notification_owner;
+        }
+        else if ($type !== 'agent') {
             $to = $ticket->user;
 
             if ($ticket->user->email != $notification_owner->email) {
@@ -102,7 +104,8 @@ class NotificationsController extends Controller
             if ($ticket->agent->email != $notification_owner->email) {
                 $to = $ticket->agent;
             }
-        } else {
+        }
+        else {
             $to = $ticket->agent;
         }
 
