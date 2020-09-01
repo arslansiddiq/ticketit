@@ -71,7 +71,9 @@ class NotificationsController extends Controller
         $data = [
             'ticket'             => serialize($ticket),
             'notification_owner' => serialize($notification_owner),
+            'images'             => serialize($this->extractLinks($ticket->html))
         ];
+
         $this->sendNotification($template, $data, $ticket, $notification_owner,
             $notification_owner->name.trans('ticketit::lang.notify-created-ticket').$ticket->subject, 'new-ticket');
 
@@ -79,6 +81,42 @@ class NotificationsController extends Controller
         $this->sendNotification($template, $data, $ticket, $notification_owner,
             $notification_owner->name.trans('ticketit::lang.notify-created-ticket').$ticket->subject, 'new-ticket-zapier');
 
+    }
+
+    /**
+     * Extract Links from content
+     * @return Array | array
+     */
+    protected function extractLinks($content)
+    {
+        //Get the page's HTML source using file_get_contents.
+        $htmlDom = new \DomDocument();
+        //Parse the HTML of the page using DOMDocument::loadHTML
+        $htmlDom->loadHtml($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING);    
+        //Extract the links from the HTML.
+        $links = $htmlDom->getElementsByTagName('a');
+        //Array that will contain our extracted links.
+        $extractedLinks = array();
+        //We can do this because the DOMNodeList object is traversable.
+        foreach($links as $link)
+        {
+            $linkText = $link->nodeValue;
+            $linkHref = $link->getAttribute('href');
+            //If the link is empty, skip it and don't
+            if(strlen(trim($linkHref)) == 0){
+                continue;
+            }
+            //Skip if it is a hashtag / anchor link.
+            if($linkHref[0] == '#'){
+                continue;
+            }
+            //Add the link to our $extractedLinks array.
+            $extractedLinks[] = array(
+                'text' => $linkText,
+                'href' => $linkHref
+            );
+        }
+        return $extractedLinks;
     }
 
     public function newCommentAndStatus(Comment $comment, Ticket $ticket, Ticket $original_ticket)

@@ -44,9 +44,9 @@ class TicketsController extends Controller
 
         if ($user->isAdmin()) {
             if ($complete) {
-                $collection = Ticket::complete()->adminUserTickets($user->id);
+                $collection = Ticket::complete()->adminUserTickets($user->id, true);
             } else {
-                $collection = Ticket::active()->adminUserTickets($user->id);
+                $collection = Ticket::active()->adminUserTickets($user->id, true);
 
             }
         } elseif ($user->isAgent()) {
