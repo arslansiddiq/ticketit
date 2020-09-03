@@ -1,4 +1,15 @@
 {{-- Load the css file to the header --}}
+
+<style type="text/css">
+    .swal2-select {
+        min-width: 50%;
+        width: 100%;
+        padding: .375em .625em;
+        background: inherit;
+        color: inherit;
+        font-size: 1.125em;
+    }
+</style>
 <script type="text/javascript">
     function loadCSS(filename) {
         var file = document.createElement("link");

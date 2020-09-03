@@ -199,17 +199,21 @@ class Ticket extends Model
      *
      * @return mixed
      */
-    public function scopeAdminUserTickets($query, $id)
+    public function scopeAdminUserTickets($query, $id, $superadmin = false)
     {
         // return $query->where(function ($subquery) use ($id) {
         //     $subquery->where('agent_id', $id)->orWhere('user_id', $id);
         // });
-        $userIds = User::find($id)->client_users()->pluck('id')->toArray();
-        array_push($userIds, $id);
-        // dd($userIds);
-        return $query->where(function ($subquery) use ($userIds) {
-            $subquery->whereIn('agent_id', $userIds)->orWhereIn('user_id', $userIds);
-        });
+        if($superadmin){
+            return $query;
+        }else{
+            $userIds = User::find($id)->client_users()->pluck('id')->toArray();
+            array_push($userIds, $id);
+            // dd($userIds);
+            return $query->where(function ($subquery) use ($userIds) {
+                $subquery->whereIn('agent_id', $userIds)->orWhereIn('user_id', $userIds);
+            });
+        }
     }
 
     /**

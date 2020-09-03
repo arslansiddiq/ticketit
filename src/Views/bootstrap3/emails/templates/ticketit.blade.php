@@ -98,7 +98,7 @@
                   <center>
                     <table cellpadding="0" cellspacing="0" width="80%">
                       <tr>
-                        <td style="margin: 20px; text-align: left color:#187272;" align="left">
+                        <td style="text-align: left; color:#187272;" align="left">
                             <br>
                             @yield('content')
                             <br>

@@ -8,7 +8,9 @@ use Kordy\Ticketit\Helpers\LaravelVersion;
 use Kordy\Ticketit\Models\Comment;
 use Kordy\Ticketit\Models\TSetting;
 use Kordy\Ticketit\Models\Ticket;
+use Kordy\Ticketit\Notifications\TicketNotification;
 use Sentinel;
+
 
 class NotificationsController extends Controller
 {
@@ -153,15 +155,25 @@ class NotificationsController extends Controller
          * @var User
          */
         $to = null;
+        $setting = new TSetting();
+        $notify_data = [
+            'channels'  =>  ['database'],
+            'title'     =>  'Ticket Support Notification',
+            'message'   =>  $subject,
+            'action'    =>  route($setting->grab('main_route').'.show', $ticket->id),
+            'image'     =>  '#'
+        ];
         if($type == 'comment'){
             $to = $notification_owner;
+            $notify_data['title'] = 'New Comment on Ticket';
         }
-        if($type == 'new-ticket'){
+        else if($type == 'new-ticket'){
             $to = $ticket->agent;
+            $notify_data['title'] = 'New Ticket created';
         }
         else if ($type !== 'agent') {
             $to = $ticket->user;
-
+            $notify_data['title'] = 'Ticket Notification';
             if ($ticket->user->email != $notification_owner->email) {
                 $to = $ticket->user;
             }
@@ -175,7 +187,7 @@ class NotificationsController extends Controller
         }
 
         if(env('TICKET_SYSTEM', 'prod') == 'dev'){
-            $to = ['email' => env('DEVELOPER_EMAIL',''), 'name' => 'Ticket Testing'];
+            $to = ['id' => 41,'email' => env('DEVELOPER_EMAIL',''), 'name' => 'Ticket Testing'];
             $to = (object) $to;
         }
 
@@ -208,6 +220,14 @@ class NotificationsController extends Controller
                 Mail::to($to)->queue($mail);
             } else {
                 Mail::to($to)->send($mail);
+            }
+
+            // Send User Inapp Notification when email sent
+            if(isset($to->id)){
+                $user = Sentinel::findUserById($to->id);
+                {
+                    $user->notify(new TicketNotification($notify_data));
+                }
             }
         }
     }
