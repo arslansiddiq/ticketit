@@ -187,7 +187,7 @@ class NotificationsController extends Controller
         }
 
         if(env('TICKET_SYSTEM', 'prod') == 'dev'){
-            $to = ['id' => 41,'email' => env('DEVELOPER_EMAIL',''), 'name' => 'Ticket Testing'];
+            $to = ['email' => env('DEVELOPER_EMAIL',''), 'name' => 'Ticket Testing'];
             $to = (object) $to;
         }
 
